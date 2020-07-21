@@ -27,6 +27,7 @@ BEGIN_MESSAGE_MAP(Cdraw1View, CView)
 	ON_WM_RBUTTONUP()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_LBUTTONUP()
+	ON_WM_MOUSEMOVE()
 END_MESSAGE_MAP()
 
 // Cdraw1View 构造/析构
@@ -36,6 +37,7 @@ Cdraw1View::Cdraw1View() noexcept
 	// TODO: 在此处添加构造代码
 
 	pointStart = 0;
+	m_bDraw = false;
 }
 
 Cdraw1View::~Cdraw1View()
@@ -105,7 +107,7 @@ void Cdraw1View::OnLButtonDown(UINT nFlags, CPoint point)
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
 	
 	pointStart = point;
-	int a{ 100 };
+	m_bDraw = true;
 	CView::OnLButtonDown(nFlags, point);
 }
 
@@ -113,9 +115,24 @@ void Cdraw1View::OnLButtonDown(UINT nFlags, CPoint point)
 void Cdraw1View::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	// TODO: 在此添加消息处理程序代码和/或调用默认值
-	CDC* dc = GetDC();
-	dc->MoveTo(pointStart);
-	dc->LineTo(point);
-	ReleaseDC(dc);
+
 	CView::OnLButtonUp(nFlags, point);
+	m_bDraw = false;
+}
+
+
+void Cdraw1View::OnMouseMove(UINT nFlags, CPoint point)
+{
+	// TODO: 在此添加消息处理程序代码和/或调用默认值
+	CClientDC dc(this);
+	CPen newPen(PS_SOLID, 1, RGB(255, 0, 255));
+	CPen* oldPen = dc.SelectObject(&newPen);
+	if (m_bDraw)
+	{
+		dc.MoveTo(pointStart);
+		dc.LineTo(point);
+	}
+	dc.SelectObject(oldPen);
+
+	CView::OnMouseMove(nFlags, point);
 }
